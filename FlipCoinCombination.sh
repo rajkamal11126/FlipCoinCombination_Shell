@@ -2,7 +2,46 @@
 
 
 read -p "How many Times you want to Flip the Coin:" Limit
+
+declare -A Singlet
+declare -A Doublet
 declare -A Triplet
+declare -A Percent
+
+for (( i=0; i<Limit; i++ ))
+do
+        num=$((RANDOM%2))
+        if [[ $num -eq 0 ]]
+        then
+                Singlet[$i]=`echo H`
+                ((count_H++))
+        else
+                Singlet[$i]=`echo T`
+                ((count_T++))
+        fi
+done
+
+for (( i=0; i<Limit; i++ ))
+do
+        num=$((RANDOM%4))
+        if [[ $num -eq 0 ]]
+        then
+                Doublet[$i]=`echo HH`
+                ((count_HH++))
+        elif [[ $num -eq 1 ]]
+        then
+                Doublet[$i]=`echo HT`
+                ((count_HT++))
+
+        elif [[ $num -eq 2 ]]
+        then
+                Doublet[$i]=`echo TH`
+                ((count_TH++))
+        else
+                Doublet[$i]=`echo TT`
+                ((count_TT++))
+        fi
+done
 for (( i=0; i<Limit; i++ ))
 do
         num=$((RANDOM%8))
@@ -39,6 +78,22 @@ do
                 ((count_TTT++))
         fi
 done
+echo -e "\nSinglet Directory:\n"${Singlet[@]}
+echo -e "\nH have been faced $count_H times"
+echo -e "T have been faced $count_T times\n"
+echo "H Percentage:" $(($count_H*100/$Limit))
+echo "T Percentage:" $(($count_T*100/$Limit))
+
+echo -e "\nDoublet Directory:\n"${Doublet[@]}
+echo -e "\nHH have been faced $count_HH times"
+echo "HT have been faced $count_HT times"
+echo "TH have been faced $count_TH times"
+echo -e "TT have been faced $count_TT times\n"
+echo "HH Percentage:" $(($count_HH*100/$Limit))
+echo "HT Percentage:" $(($count_HT*100/$Limit))
+echo "TH Percentage:" $(($count_TH*100/$Limit))
+echo "TT Percentage:" $(($count_TT*100/$Limit))
+
 echo -e "\nTriplet Combination:\n"${Triplet[@]}
 echo -e "\nHHH have been faced $count_HHH times"
 echo -e "\nHHT have been faced $count_HHT times"
@@ -57,3 +112,13 @@ echo -e "\nTHT Percent=" $(($count_THT*100/$Limit))
 echo -e "\nTTH Percent=" $(($count_TTH*100/$Limit))
 echo -e "\nTTT Percent=" $(($count_TTT*100/$Limit))
 
+echo -e "\nSorted Percentage:\n"
+echo ${Percent[@]} | tr " " "\n" | sort -n
+
+IFS=$'\n' Sorted=($(sort -nr <<<"${Percent[*]}"))
+unset IFS
+for i in "${!Percent[@]}"
+do
+        [[ ${Sorted[0]} -ne ${Percent[$i]} ]] && continue
+        echo -e "\nWining Combination: $i"
+done
